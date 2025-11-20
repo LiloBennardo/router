@@ -1,0 +1,32 @@
+# Configuration des interfaces
+set interfaces ethernet eth2 address 1.1.1.252/29
+set interfaces ethernet eth3 address 10.0.3.250/24
+
+# Routage statique par défaut vers l'ISP
+set protocols static route 0.0.0.0/0 next-hop 1.1.1.253
+
+# Configuration BGP
+set protocols bgp system-as 65300
+set protocols bgp parameters router-id 1.1.1.252
+set protocols bgp neighbor 1.1.1.253 remote-as 65000
+set protocols bgp neighbor 1.1.1.253 address-family ipv4-unicast
+set protocols bgp address-family ipv4-unicast network 10.0.3.0/24
+set protocols bgp address-family ipv4-unicast redistribute ospf
+
+# Configuration OSPF (Area 0 et Area 3)
+set protocols ospf area 0 network 1.1.1.248/29
+set protocols ospf area 3 network 10.0.3.0/24
+set protocols ospf redistribute bgp
+
+# Configuration VPN OpenConnect (avec RADIUS)
+# NOTE : Les fichiers de certificats (server.crt/server.key) doivent exister
+set vpn openconnect ssl-cert-file /config/auth/server.crt
+set vpn openconnect ssl-key-file /config/auth/server.key
+set vpn openconnect authentication mode radius
+# IP du serveur RADIUS (supposons 10.0.3.10 comme dans votre rapport)
+set vpn openconnect authentication radius server 10.0.3.10 secret radiussecret
+set vpn openconnect network 10.10.10.0/24
+set vpn openconnect port 4443
+
+commit
+save

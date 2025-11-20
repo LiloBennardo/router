@@ -1,0 +1,22 @@
+# Configuration des interfaces (eth0 pour management, eth1 pour le WAN /29)
+set interfaces ethernet eth0 address 192.168.80.10/24
+set interfaces ethernet eth1 address 1.1.1.253/29
+
+# Routage statique par défaut vers l'externe (selon votre table 1.1)
+set protocols static route 0.0.0.0/0 next-hop 192.168.80.2
+
+# Configuration BGP
+set protocols bgp system-as 65000
+set protocols bgp parameters router-id 1.1.1.253
+set protocols bgp neighbor 1.1.1.250 remote-as 65100
+set protocols bgp neighbor 1.1.1.250 address-family ipv4-unicast
+set protocols bgp neighbor 1.1.1.251 remote-as 65200
+set protocols bgp neighbor 1.1.1.251 address-family ipv4-unicast
+set protocols bgp neighbor 1.1.1.252 remote-as 65300
+set protocols bgp neighbor 1.1.1.252 address-family ipv4-unicast
+
+# Configuration OSPF (uniquement l'Area 0 pour le WAN commun, si utilisé)
+set protocols ospf area 0 network 1.1.1.248/29
+
+commit
+save

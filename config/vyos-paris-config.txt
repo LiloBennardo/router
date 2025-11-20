@@ -1,0 +1,23 @@
+# Configuration des interfaces
+set interfaces ethernet eth2 address 1.1.1.250/29
+set interfaces ethernet eth3 address 10.0.1.250/24
+
+# Routage statique par défaut vers l'ISP
+set protocols static route 0.0.0.0/0 next-hop 1.1.1.253
+
+# Configuration BGP
+set protocols bgp system-as 65100
+set protocols bgp parameters router-id 1.1.1.250
+set protocols bgp neighbor 1.1.1.253 remote-as 65000
+set protocols bgp neighbor 1.1.1.253 address-family ipv4-unicast
+set protocols bgp address-family ipv4-unicast network 10.0.1.0/24
+# L'option 'redistribute ospf' doit aussi être présente pour l'alignement
+set protocols bgp address-family ipv4-unicast redistribute ospf
+
+# Configuration OSPF (Area 0 et Area 1)
+set protocols ospf area 0 network 1.1.1.248/29
+set protocols ospf area 1 network 10.0.1.0/24
+set protocols ospf redistribute bgp
+
+commit
+save
