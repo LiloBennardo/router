@@ -13,6 +13,26 @@
   <span style="background:#F3E8FF;color:#6F2DBD;padding:6px 14px;border-radius:999px;font-weight:600;font-size:0.85rem;">#Radius & FTP</span>
 </div>
 
+---
+
+## 🛠️ Mise en Place du Laboratoire (Prérequis)
+
+Ce projet nécessite la création de machines virtuelles pour simuler les routeurs (VyOS) et l'environnement d'hyperviseur (VMware).
+
+| Ressource | Type | Où le trouver |
+| :--- | :--- | :--- |
+| **VyOS** | Système d'exploitation Routeur (ISO) | Téléchargez l'**image ISO** sur le [site officiel de VyOS](https://vyos.io/). |
+| **VMware** | Hyperviseur (logiciel de virtualisation) | Téléchargez **VMware Workstation Player** (gratuit pour usage personnel) ou **Workstation Pro** sur le [site officiel de VMware](https://www.vmware.com/products/workstation-player.html). |
+
+### Feuille de Route Initiale
+
+1.  **Télécharger** les deux ressources ci-dessus.
+2.  **Installer** VMware sur votre machine hôte.
+3.  **Créer** 4 Machines Virtuelles (VMs) sous VMware, en montant l'ISO VyOS pour simuler les routeurs.
+4.  **Configurer** les réseaux virtuels (VMnets) de VMware pour simuler les connexions physiques (WAN/LAN) avant d'appliquer les configurations BGP/OSPF.
+
+---
+
 ## Sommaire
 
 <div style="background:#F4F7FF;border-left:6px solid #5B8DEF;padding:18px 22px;border-radius:18px;margin-bottom:22px;">
