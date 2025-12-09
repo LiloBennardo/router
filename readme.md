@@ -1,7 +1,7 @@
 <div style="background:linear-gradient(135deg,#07162B,#0F4C81);color:#F8FAFC;padding:34px;border-radius:22px;box-shadow:0 24px 45px rgba(7,22,43,0.55);text-align:center;margin-bottom:26px;">
   <p style="letter-spacing:0.35em;font-size:0.85rem;text-transform:uppercase;margin:0;color:#8DDCFF;">TP CCSN</p>
   <h1 style="margin:10px 0 6px 0;font-size:2.2rem;">Rapport de Routage – BGP & OSPF Multi-Area</h1>
-  <p style="font-weight:600;margin:0 0 4px 0;">Projet E5 · Architecture Réseau Sécurisée</p>
+  <p style="font-weight:600;margin:0 0 4px 0;">Projet · Architecture Réseau Sécurisée</p>
   <p style="margin:0 0 12px 0;">Par <strong>Lilo BENNARDO</strong></p>
   <p style="margin:0;font-size:0.95rem;color:#D6ECFF;">Panorama ISP → Paris → Lyon → Marseille avec routage dynamique, redistribution et VPN.</p>
 </div>
@@ -42,7 +42,7 @@
 
 ## Introduction
 
-> <span style="color:#0D6EFD;font-weight:600;">Objectif :</span> documentation complète de l’architecture multi-sites conçue par **Lilo BENNARDO**, couvrant adressage, protocoles dynamiques, redistribution et sécurisation VPN/Radius/FTP pour l’épreuve E5.
+> <span style="color:#0D6EFD;font-weight:600;">Objectif :</span> documentation complète de l’architecture multi-sites conçue par **Lilo BENNARDO**, couvrant adressage, protocoles dynamiques, redistribution et sécurisation VPN/Radius/FTP.
 
 ---
 
