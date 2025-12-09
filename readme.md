@@ -417,3 +417,7 @@ save
 ## 9. Conclusion
 
 > <span style="color:#0B7285;font-weight:600;">Bilan :</span> la combinaison BGP/OSPF/vpn répond aux objectifs pédagogiques : connectivité inter-AS assurée, convergence interne rapide, accès distants chiffrés et preuves Wireshark à l’appui. Cette architecture constitue une base solide pour de futures évolutions sécurisées.
+#   r o u t e r  
+ #   v y o s  
+ #   r o u t e r  
+ 
