@@ -114,3 +114,307 @@
 > <span style="color:#FF7A18;font-weight:600;">Principe :</span> chaque site possède un WAN en /29 sur `eth2` (ou `eth1` côté ISP) et un LAN /24 sur `eth3`, garantissant une séparation claire.
 
 ### 2.1 ISP
+
+
+```
+set interfaces ethernet eth0 address 192.168.80.10/24
+set interfaces ethernet eth1 address 1.1.1.253/29
+commit
+save
+```
+
+### 2.2 Paris
+
+```
+set interfaces ethernet eth2 address 1.1.1.250/29
+set interfaces ethernet eth3 address 10.0.1.250/24
+commit
+save
+```
+
+### 2.3 Lyon
+
+```
+set interfaces ethernet eth2 address 1.1.1.251/29
+set interfaces ethernet eth3 address 10.0.2.250/24
+commit
+save
+```
+
+### 2.4 Marseille
+
+```
+set interfaces ethernet eth2 address 1.1.1.252/29
+set interfaces ethernet eth3 address 10.0.3.250/24
+commit
+save
+```
+
+---
+
+## 3. Configuration BGP
+
+> <span style="color:#845EF7;font-weight:600;">But :</span> publier les LAN locaux via eBGP et maintenir la visibilité des /24 chez l’ISP.
+
+### 3.1 ISP (AS 65000)
+
+```
+set protocols bgp system-as 65000
+set protocols bgp parameters router-id 1.1.1.253
+set protocols bgp neighbor 1.1.1.250 remote-as 65100
+set protocols bgp neighbor 1.1.1.250 address-family ipv4-unicast
+set protocols bgp neighbor 1.1.1.251 remote-as 65200
+set protocols bgp neighbor 1.1.1.251 address-family ipv4-unicast
+set protocols bgp neighbor 1.1.1.252 remote-as 65300
+set protocols bgp neighbor 1.1.1.252 address-family ipv4-unicast
+commit
+save
+```
+
+**Vérification – `show bgp summary`**  
+![isp-bgp-summary](images/isp-bgp-summary.png)
+
+**Vérification – `show ip route`**  
+![isp-ip-route](images/isp-ip-route.png)
+
+### 3.2 Paris (AS 65100)
+
+```
+set protocols bgp system-as 65100
+set protocols bgp parameters router-id 1.1.1.250
+set protocols bgp neighbor 1.1.1.253 remote-as 65000
+set protocols bgp neighbor 1.1.1.253 address-family ipv4-unicast
+set protocols bgp address-family ipv4-unicast network 10.0.1.0/24
+commit
+save
+```
+
+**Vérification – `show bgp summary`**  
+![paris-bgp-summary](images/paris-bgp-summary.png)
+
+**Vérification – `show configuration protocols bgp`**  
+![paris-bgp-config](images/paris-bgp-config.png)
+
+**Vérification – `show ip route`**  
+![paris-ip-route](images/paris-ip-route.png)
+
+### 3.3 Lyon (AS 65200)
+
+```
+set protocols bgp system-as 65200
+set protocols bgp parameters router-id 1.1.1.251
+set protocols bgp neighbor 1.1.1.253 remote-as 65000
+set protocols bgp neighbor 1.1.1.253 address-family ipv4-unicast
+set protocols bgp address-family ipv4-unicast network 10.0.2.0/24
+commit
+save
+```
+
+**Vérification – `show bgp summary`**  
+![lyon-bgp-summary](images/lyon-bgp-summary.png)
+
+**Vérification – `show configuration protocols bgp`**  
+![lyon-bgp-config](images/lyon-bgp-config.png)
+
+**Vérification – `show ip route`**  
+![lyon-ip-route](images/lyon-ip-route.png)
+
+### 3.4 Marseille (AS 65300)
+
+```
+set protocols bgp system-as 65300
+set protocols bgp parameters router-id 1.1.1.252
+set protocols bgp neighbor 1.1.1.253 remote-as 65000
+set protocols bgp neighbor 1.1.1.253 address-family ipv4-unicast
+set protocols bgp address-family ipv4-unicast network 10.0.3.0/24
+commit
+save
+```
+
+**Vérification – `show bgp summary`**  
+![marseille-bgp-summary](images/marseille-bgp-summary.png)
+
+**Vérification – `show configuration protocols bgp`**  
+![marseille-bgp-config](images/marseille-bgp-config.png)
+
+**Vérification – `show ip route`**  
+![marseille-ip-route](images/marseille-ip-route.png)
+
+---
+
+## 4. Configuration OSPF multi-area
+
+> <span style="color:#FFB703;font-weight:600;">Stratégie :</span> Area 0 pour le WAN commun, une zone dédiée par site (1/2/3) et redistribution BGP → OSPF sur les PE.
+
+### 4.1 ISP – Backbone Area 0
+
+```
+set protocols ospf area 0 network 1.1.1.248/29
+commit
+save
+```
+
+**Vérification – `show protocols ospf`**  
+![isp-ospf](images/isp-ospf.png)
+
+**Vérification – `show ip route ospf`**  
+![isp-ospf-route](images/isp-ospf-route.png)
+
+### 4.2 Paris – Area 1
+
+```
+set protocols ospf area 0 network 1.1.1.248/29
+set protocols ospf area 1 network 10.0.1.0/24
+set protocols ospf redistribute bgp
+commit
+save
+```
+
+**Vérification – `show protocols ospf`**  
+![paris-ospf](images/paris-ospf.png)
+
+**Vérification – `show ip route ospf`**  
+![paris-ospf-route](images/paris-ospf-route.png)
+
+### 4.3 Lyon – Area 2
+
+```
+set protocols ospf area 0 network 1.1.1.248/29
+set protocols ospf area 2 network 10.0.2.0/24
+set protocols ospf redistribute bgp
+commit
+save
+```
+
+**Vérification – `show protocols ospf`**  
+![lyon-ospf](images/lyon-ospf.png)
+
+**Vérification – `show ip route ospf`**  
+![lyon-ospf-route](images/lyon-ospf-route.png)
+
+### 4.4 Marseille – Area 3
+
+```
+set protocols ospf area 0 network 1.1.1.248/29
+set protocols ospf area 3 network 10.0.3.0/24
+set protocols ospf redistribute bgp
+commit
+save
+```
+
+**Vérification – `show protocols ospf`**  
+![marseille-ospf](images/marseille-ospf.png)
+
+**Vérification – `show ip route ospf`**  
+![marseille-ospf-route](images/marseille-ospf-route.png)
+
+---
+
+## 5. Redistribution BGP <-> OSPF
+
+> <span style="color:#02B2AF;font-weight:600;">Alignement :</span> double redistribution pour fournir une table cohérente à tous les protocoles.
+
+```
+set protocols ospf redistribute bgp
+set protocols bgp address-family ipv4-unicast redistribute ospf
+commit
+save
+```
+
+---
+
+## 6. Tests de connectivité
+
+> <span style="color:#E63946;font-weight:600;">Preuves :</span> ping inter-sites et traceroute confirment la diffusion via l’ISP.
+
+### 6.1 Ping inter-sites (LAN -> LAN)
+
+**Paris -> Lyon**
+
+```
+ping 10.0.2.250
+```
+
+![ping-paris-lyon](images/ping-paris-lyon.png)
+
+**Paris -> Marseille**
+
+```
+ping 10.0.3.250
+```
+
+![ping-paris-marseille](images/ping-paris-marseille.png)
+
+**Lyon -> Paris**
+
+```
+ping 10.0.1.250
+```
+
+![ping-lyon-paris](images/ping-lyon-paris.png)
+
+
+
+### 6.2 Traceroute (preuve que le trafic passe par l’ISP)
+
+**Exemple Paris -> Lyon**  
+![traceroute-paris-lyon](images/traceroute-paris-lyon.png)
+
+---
+
+## 7. Analyse Wireshark (FTP non lisible grâce au VPN)
+
+> <span style="color:#6A4C93;font-weight:600;">Confidentialité :</span> capture chiffrée attestant que le FTP passe par le tunnel.
+
+![wireshark-vpn](images/wireshark-vpn.png)
+
+---
+
+## 8. Configuration VPN (OpenConnect + OTP + RADIUS)
+
+> <span style="color:#1D4ED8;font-weight:600;">Assemblage :</span> chaîne Radius + vsftpd + OpenConnect pour authentifier et protéger les accès distants.
+
+### Config RADIUS
+
+```
+nano /etc/freeradius/3.0/users
+```
+
+```
+lilo Cleartext-Password := "12345"
+```
+
+```
+systemctl restart freeradius
+systemctl enable freeradius
+```
+
+```
+apt update
+apt install vsftpd -y
+systemctl enable vsftpd
+systemctl restart vsftpd
+```
+
+![config-radius](images/config-radius.png)
+
+### Connexion VPN nomade
+
+```
+set vpn openconnect ssl-cert-file /config/auth/server.crt
+set vpn openconnect ssl-key-file /config/auth/server.key
+set vpn openconnect authentication mode radius
+set vpn openconnect authentication radius server 10.0.3.10 secret radiussecret
+set vpn openconnect network 10.10.10.0/24
+set vpn openconnect port 4443
+commit
+save
+```
+
+![vpn-client](images/vpn-client.png)
+
+---
+
+## 9. Conclusion
+
+> <span style="color:#0B7285;font-weight:600;">Bilan :</span> la combinaison BGP/OSPF/vpn répond aux objectifs pédagogiques : connectivité inter-AS assurée, convergence interne rapide, accès distants chiffrés et preuves Wireshark à l’appui. Cette architecture constitue une base solide pour de futures évolutions sécurisées.
